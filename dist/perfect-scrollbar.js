@@ -1,6 +1,6 @@
 /*!
  * perfect-scrollbar v1.3.0
- * (c) 2017 Hyunje Jun
+ * (c) 2018 Hyunje Jun
  * @license MIT
  */
 (function (global, factory) {
@@ -320,7 +320,16 @@ var env = {
     /Chrome/i.test(navigator && navigator.userAgent),
 };
 
+var requestAnimationFrame = window.requestAnimationFrame || (function (cb) { return cb(); });
+
+var lastI = null;
 var updateGeometry = function(i) {
+  lastI = i;
+  requestAnimationFrame(updateGeometry$1);
+};
+
+function updateGeometry$1() {
+  var i = lastI;
   var element = i.element;
 
   i.containerWidth = element.clientWidth;
@@ -406,7 +415,7 @@ var updateGeometry = function(i) {
     i.scrollbarYTop = 0;
     element.scrollTop = 0;
   }
-};
+}
 
 function getThumbSize(i, thumbSize) {
   if (i.settings.minScrollbarLength) {
@@ -725,7 +734,7 @@ var wheel = function(i) {
       element.scrollTop + element.offsetHeight === element.scrollHeight;
     var isLeft = element.scrollLeft === 0;
     var isRight =
-      element.scrollLeft + element.offsetWidth === element.offsetWidth;
+      element.scrollLeft + element.offsetWidth === element.scrollWidth;
 
     var hitsBound;
 
