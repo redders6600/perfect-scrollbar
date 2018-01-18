@@ -323,8 +323,13 @@ var env = {
 var requestAnimationFrame = window.requestAnimationFrame || (function (cb) { return cb(); });
 
 var lastI = null;
-var updateGeometry = function(i) {
+var updateGeometry = function(i, force) {
   lastI = i;
+  // Manual calls to `update` require this to execute immediately.
+  if (force) {
+    updateGeometry$1();
+    return;
+  }
   requestAnimationFrame(updateGeometry$1);
 };
 
@@ -1261,7 +1266,7 @@ PerfectScrollbar.prototype.update = function update () {
   set(this.scrollbarXRail, { display: 'none' });
   set(this.scrollbarYRail, { display: 'none' });
 
-  updateGeometry(this);
+  updateGeometry(this, true);
 
   processScrollDiff(this, 'top', 0, false, true);
   processScrollDiff(this, 'left', 0, false, true);
