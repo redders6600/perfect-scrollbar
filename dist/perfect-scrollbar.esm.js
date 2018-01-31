@@ -314,21 +314,7 @@ var env = {
     /Chrome/i.test(navigator && navigator.userAgent),
 };
 
-var requestAnimationFrame = window.requestAnimationFrame || (function (cb) { return cb(); });
-
-var lastI = null;
-var updateGeometry = function(i, force) {
-  lastI = i;
-  // Manual calls to `update` require this to execute immediately.
-  if (force) {
-    updateGeometry$1();
-    return;
-  }
-  requestAnimationFrame(updateGeometry$1);
-};
-
-function updateGeometry$1() {
-  var i = lastI;
+var updateGeometry = function (i) {
   var element = i.element;
 
   i.containerWidth = element.clientWidth;
@@ -414,7 +400,7 @@ function updateGeometry$1() {
     i.scrollbarYTop = 0;
     element.scrollTop = 0;
   }
-}
+};
 
 function getThumbSize(i, thumbSize) {
   if (i.settings.minScrollbarLength) {
@@ -1233,7 +1219,18 @@ var PerfectScrollbar = function PerfectScrollbar(element, userSettings) {
   this.lastScrollTop = element.scrollTop; // for onScroll only
   this.lastScrollLeft = element.scrollLeft; // for onScroll only
   this.event.bind(this.element, 'scroll', function (e) { return this$1.onScroll(e); });
+  this.updateOwnGeometry();
+};
+
+PerfectScrollbar.prototype.updateOwnGeometry = function updateOwnGeometry () {
+  if (this.currentAFReqId) { this.currentAFReqId = null; }
   updateGeometry(this);
+};
+
+PerfectScrollbar.prototype.updateOwnGeometryOnAnimFrame = function updateOwnGeometryOnAnimFrame () {
+  if (this.currentAFReqId) { cancelAnimationFrame(this.currentAFReqId); }
+  this.currentAFReqId =
+    requestAnimationFrame(this.updateOwnGeometry.bind(this));
 };
 
 PerfectScrollbar.prototype.update = function update () {
@@ -1260,7 +1257,7 @@ PerfectScrollbar.prototype.update = function update () {
   set(this.scrollbarXRail, { display: 'none' });
   set(this.scrollbarYRail, { display: 'none' });
 
-  updateGeometry(this, true);
+  this.updateOwnGeometry();
 
   processScrollDiff(this, 'top', 0, false, true);
   processScrollDiff(this, 'left', 0, false, true);
@@ -1274,7 +1271,7 @@ PerfectScrollbar.prototype.onScroll = function onScroll (e) {
     return;
   }
 
-  updateGeometry(this);
+  this.updateOwnGeometryOnAnimFrame();
   processScrollDiff(this, 'top', this.element.scrollTop - this.lastScrollTop);
   processScrollDiff(
     this,
