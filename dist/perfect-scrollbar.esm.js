@@ -314,7 +314,7 @@ var env = {
     /Chrome/i.test(navigator && navigator.userAgent),
 };
 
-var updateGeometry = function (i) {
+var updateGeometry = function(i) {
   var element = i.element;
 
   i.containerWidth = element.clientWidth;
@@ -1229,8 +1229,9 @@ PerfectScrollbar.prototype.updateOwnGeometry = function updateOwnGeometry () {
 
 PerfectScrollbar.prototype.updateOwnGeometryOnAnimFrame = function updateOwnGeometryOnAnimFrame () {
   if (this.currentAFReqId) { cancelAnimationFrame(this.currentAFReqId); }
-  this.currentAFReqId =
-    requestAnimationFrame(this.updateOwnGeometry.bind(this));
+  this.currentAFReqId = requestAnimationFrame(
+    this.updateOwnGeometry.bind(this)
+  );
 };
 
 PerfectScrollbar.prototype.update = function update () {
